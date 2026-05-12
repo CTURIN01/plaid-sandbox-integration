@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Plaid Sandbox Integration</title>
+</head>
+<body>
+  <h1>Plaid Sandbox Integration</h1>
+  <button id="link-button">Link sandbox account</button>
+
+  <pre id="output" style="margin-top:20px; background:#111; color:#0f0; padding:10px;"></pre>
+
+  <script src="https://cdn.plaid.com/link/v2/stable/link-initialize.js"></script>
+  <script>
+    async function createLinkToken() {
+      const res = await fetch('/api/create_link_token', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+      });
+      const data = await res.json();
+      return data.link_token;
+    }
+
+    function log(message, obj) {
+      const out = document.getElementById('output');
+      out.textContent += '\\n' + message + (obj ? ' ' + JSON.stringify(obj, null, 2) : '');
+    }
+
+    document.getElementById('link-button').onclick = async function () {
+      const linkToken = await createLinkToken();
+
+      const handler = Plaid.create({
+        token: linkToken,
+        onSuccess: async function (public_token, metadata) {
+          log('Link success, public_token received:', { public_token, metadata });
+
+          const res = await fetch('/api/exchange_public_token', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ public_token })
+          });
+
+          const data = await res.json();
+          log('Access token + item_id stored on server:', data);
+        },
+        onExit: function (err, metadata) {
+          log('Link exited', { err, metadata });
+        },
+        onEvent: function (eventName, metadata) {
+          log('Link event: ' + eventName, metadata);
+        }
+      });
+
+      handler.open();
+    };
+  </script>
+</body>
+</html>

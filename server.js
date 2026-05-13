@@ -10,7 +10,7 @@ const PORT = 4000;
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-let SAVED_ACCESS_TOKEN = null;
+let SAVED_ACCESS_TOKEN = access-sandbox-382c9a88-a8f4-48fa-bd18-55c43d3f4db7;
 let SAVED_ITEM_ID = null;
 let SAVED_CURSOR = null;
 

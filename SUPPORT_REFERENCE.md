@@ -111,3 +111,12 @@ POST /sandbox/item/fire_webhook
 POST /sandbox/public_token/create
 { "institution_id": "ins_109508", "initial_products": ["transactions"] }
 ```
+
+---
+
+## Debugging Checklist
+
+- [ ] Verify PLAID_ENV matches API host (sandbox vs production)
+- [ ] Confirm access_token was exchanged before calling transactionsSync
+- [ ] Check cursor value — null on first sync, saved value on subsequent calls
+- [ ] Wait for INITIAL_UPDATE webhook before pulling transactions
